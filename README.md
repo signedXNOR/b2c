@@ -29,3 +29,7 @@ Flags:
 ## Known issues
 - If started with `-d`, the program will not listen to kill signals, and must be killed with ^C.
 - If started with `-d`, and processing a very big file, funky visual bugs happen.
+
+# Building it
+Build file exists only for GNU/Linux, and may use libraries unavailable on Windows.
+Needs Raylib <3
