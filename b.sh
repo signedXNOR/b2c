@@ -1,0 +1,1 @@
+gcc btc.c -o b2c -lraylib
