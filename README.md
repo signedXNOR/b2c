@@ -1,4 +1,4 @@
-# b2c
+# b2c / bytes to colors
 Raw byte to image converter.
 <img width="968" height="968" alt="thing" src="https://github.com/user-attachments/assets/847f882f-da7c-4292-8b25-8a6c85ab21e3" />
 Image shows a Windows executable ^^^
