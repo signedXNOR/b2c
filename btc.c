@@ -119,7 +119,7 @@ int main(int argc, char ** argv)
         }
         EndDrawing();
         free(pixels);
-        while (true) { /* nada */ }
+        while (!WindowShouldClose()) { /* nada */ } 
         CloseWindow();
     } else {
         ExportImage(
