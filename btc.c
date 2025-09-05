@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
             if (i%3==0) pixels[(int)((i+1*(i==0))/3)].r = c;
             if (i%3==1) pixels[(int)((i+1*(i==0))/3)].g = c;
             if (i%3==2) pixels[(int)((i+1*(i==0))/3)].b = c;
-            pixels[(int)((i+1*(i==0))/4)].a = 0xff;
+            pixels[(int)((i+1*(i==0))/3)].a = 0xff;
             i++;
         } else {
             switch (i%3)
@@ -85,10 +85,6 @@ int main(int argc, char ** argv)
         pixels[pixelcnt+l].g = 0;
         pixels[pixelcnt+l].b = 0;
         pixels[pixelcnt+l].a = 255;
-    }
-    for (unsigned int k = 0; k<pixelcnt; k++)
-    {
-        pixels[k].a = 255;
     }
 
     if (santamaria)
