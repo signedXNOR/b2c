@@ -23,7 +23,7 @@ Flags:
 
 ## To do
 - Add option to reverse the effect of the program by taking in an image as the input and outputting a file.
-- Add option to memcmp 2 files and show the differences between them (if any) as rgba8 pixels in an image.
+- Add option to memcmp 2 files and show the differences between them (if any) as an rgb8 image.
 
 ## Known issues
 - [FIXED] If started with `-d`, the program will not listen to kill signals, and must be killed with ^C.
