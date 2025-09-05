@@ -17,9 +17,7 @@ Flags:
 
 -d --display --draw : for displaying the image in a window instead of saving it to a file
 
--s --scale : WIP
-
--w --width : WIP
+-w --width : change the preffered width of the window (only has any effect if also doing -d/--display/--draw
 
 -r --reverse : WIP
 
