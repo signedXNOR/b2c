@@ -10,21 +10,17 @@ bool santamaria = 0;
 bool verbose = 0; 
 bool reverse = 0;
 
-unsigned int pixelcnt = 1;
-unsigned int width = 1;
-
 Color * pixels;
+unsigned int pixelcnt = 1;
+
 unsigned int scale = 1;
+unsigned int width = 1;
 unsigned int prefferedWidth = 720;
 
 int main(int argc, char ** argv)
 {
     for (int i = 0; i<argc; i++)
     {
-        if ((!strcmp(argv[i], "-s") || !strcmp(argv[i], "--scale")) && argv[i+1] != NULL)
-        {
-            scale = atoi(argv[i+1]);
-        }
         if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display") || !strcmp(argv[i], "--draw"))
         {
             santamaria = 1;
