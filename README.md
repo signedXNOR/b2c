@@ -32,5 +32,5 @@ Flags:
 - If started with `-d`, and processing a very big file, funky visual bugs happen.
 
 # Building it
-Build file exists only for GNU/Linux, and may use libraries unavailable on Windows.
+Build file exists only for GNU/Linux, and the code may use libraries unavailable on Windows.
 Needs Raylib <3
