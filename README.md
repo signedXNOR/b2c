@@ -15,7 +15,7 @@ Flags:
 
 -v --verbose : for some printfs
 
--d --display : for displaying the image in a window instead of saving it to a file
+-d --display --draw : for displaying the image in a window instead of saving it to a file
 
 -s --scale : WIP
 
@@ -28,8 +28,8 @@ Flags:
 - Add option to memcmp 2 files and show the differences between them (if any) as rgba8 pixels in an image.
 
 ## Known issues
-- If started with `-d`, and processing a very big file, funky visual bugs happen.
 - [FIXED] If started with `-d`, the program will not listen to kill signals, and must be killed with ^C.
+- [FIXED] If started with `-d`, and processing a very big file, funky visual bugs happen.
 
 # Building it
 Build file exists only for GNU/Linux, and the code may use libraries unavailable on Windows.
