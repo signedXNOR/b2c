@@ -14,7 +14,7 @@ unsigned int width = 10;
 
 Color * pixels;
 unsigned int scale = 1;
-unsigned int prefferedWidth = 1300;
+unsigned int prefferedWidth = 1000;
 
 int main(int argc, char ** argv)
 {
@@ -73,12 +73,14 @@ int main(int argc, char ** argv)
         }
     }
 
+    /* figuring out the grid size: */
     width = 1;
-    while (pixelcnt > width*width)
-    {
-        width++;
-    }
+    while (pixelcnt > width*width) width++;
+
+    /* allocating new pixels in order to fit the grid: */
     pixels = realloc(pixels, width*width*sizeof(Color));
+
+    /* setting said new pixels to 0x000000FF */
     for (unsigned int l = 0; l < width*width-pixelcnt; l++)
     {
         pixels[pixelcnt+l].r = 0;
@@ -87,8 +89,10 @@ int main(int argc, char ** argv)
         pixels[pixelcnt+l].a = 255;
     }
 
-    if (santamaria)
+    if (santamaria) /* if window rendering option is true */
     {
+        EnableEventWaiting();
+        SetTargetFPS(60);
         scale = (prefferedWidth/width); // scale works weird, need to rework
         SetTraceLogLevel(LOG_ERROR);
 
@@ -115,9 +119,11 @@ int main(int argc, char ** argv)
         }
         EndDrawing();
         free(pixels);
-        while (!WindowShouldClose()) { /* nada */ } 
+        while (!WindowShouldClose()) { PollInputEvents(); }
         CloseWindow();
-    } else {
+    }
+    else /* if window rendering option is not true*/
+    {
         ExportImage(
         (Image)
         {
