@@ -10,11 +10,11 @@ bool santamaria = 0;
 bool verbose = 0;
 
 unsigned int pixelcnt = 1;
-unsigned int width = 10;
+unsigned int width = 1;
 
 Color * pixels;
 unsigned int scale = 1;
-unsigned int prefferedWidth = 1000;
+unsigned int prefferedWidth = 720;
 
 int main(int argc, char ** argv)
 {
@@ -89,9 +89,8 @@ int main(int argc, char ** argv)
         pixels[pixelcnt+l].a = 255;
     }
 
-    if (santamaria) /* if window rendering option is true */
+    if (santamaria && prefferedWidth>=width) /* if window rendering option is true */
     {
-        EnableEventWaiting();
         SetTargetFPS(60);
         scale = (prefferedWidth/width); // scale works weird, need to rework
         SetTraceLogLevel(LOG_ERROR);
@@ -121,6 +120,11 @@ int main(int argc, char ** argv)
         free(pixels);
         while (!WindowShouldClose()) { PollInputEvents(); }
         CloseWindow();
+    }
+    else if (santamaria && prefferedWidth<width)
+    {
+        free(pixels);
+        printf("Sorry, the image is too big to display at the preffered width!\n");
     }
     else /* if window rendering option is not true*/
     {
