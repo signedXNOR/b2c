@@ -7,7 +7,8 @@
 #include <raylib.h>
 
 bool santamaria = 0;
-bool verbose = 0;
+bool verbose = 0; 
+bool reverse = 0;
 
 unsigned int pixelcnt = 1;
 unsigned int width = 1;
@@ -24,7 +25,7 @@ int main(int argc, char ** argv)
         {
             scale = atoi(argv[i+1]);
         }
-        if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display"))
+        if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display") || !strcmp(argv[i], "--draw"))
         {
             santamaria = 1;
         }
@@ -38,7 +39,7 @@ int main(int argc, char ** argv)
         }
         if ((!strcmp(argv[i], "-r") || !strcmp(argv[i], "--reverse")))
         {
-            /* to do */
+            reverse = true;
         }
     }
 
@@ -89,39 +90,28 @@ int main(int argc, char ** argv)
         pixels[pixelcnt+l].a = 255;
     }
 
-    if (santamaria && prefferedWidth>=width) /* if window rendering option is true */
+    // make the image final image
+    Image finalImage = (Image){pixels, width, width, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
+
+    // what to do with the final image:
+    if (santamaria && prefferedWidth>=width) /* if window rendering option is true and can display */
     {
         SetTargetFPS(60);
-        scale = (prefferedWidth/width); // scale works weird, need to rework
+        scale = (prefferedWidth/width);
         SetTraceLogLevel(LOG_ERROR);
 
         InitWindow(width*scale, width*scale, "0x4e to rgb");
         BeginDrawing();
         ClearBackground(BLACK);
         
-        for (unsigned int j = 0; j<width; j++)
-        {
-            for (unsigned int i = 0; i<width; i++)
-            {
-                DrawRectanglePro(
-                    (Rectangle)
-                    {
-                        i*scale,
-                        j*scale,
-                        width*scale,
-                        width*scale
-                    },
-                    (Vector2){0.0f, 0.0f},
-                    0.0f,
-                    pixels[i+j*width]); 
-            }
-        }
+        DrawTextureEx(LoadTextureFromImage(finalImage), (Vector2){0, 0}, 0.0f, scale, WHITE);
+        
         EndDrawing();
         free(pixels);
         while (!WindowShouldClose()) { PollInputEvents(); }
         CloseWindow();
     }
-    else if (santamaria && prefferedWidth<width)
+    else if (santamaria && prefferedWidth<width) /* if window rendering option is true but can't display */
     {
         free(pixels);
         printf("Sorry, the image is too big to display at the preffered width!\n");
@@ -129,15 +119,11 @@ int main(int argc, char ** argv)
     else /* if window rendering option is not true*/
     {
         ExportImage(
-        (Image)
-        {
-            pixels,
-            width,
-            width,
-            1,
-            PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
-        },
+        finalImage,
         "color-(previously-bytes).png");
         free(pixels);
     }
 }
+
+/* THANKS SECTION: */
+/*  thx to @jefferym on the raylib discord for help with rendering stuff */
