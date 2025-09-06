@@ -17,8 +17,12 @@ unsigned int scale = 1;
 unsigned int width = 1;
 unsigned int prefferedWidth = 720;
 
+unsigned char * inBytes;
+unsigned char * outBytes;
+
 int main(int argc, char ** argv)
 {
+    /* args */
     for (int i = 0; i<argc; i++)
     {
         if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display") || !strcmp(argv[i], "--draw"))
@@ -39,86 +43,143 @@ int main(int argc, char ** argv)
         }
     }
 
-    pixels = calloc(1, sizeof(Color));
-    unsigned int i = 0;
-    while (true)
+    if (!reverse)
     {
-        int c = getc(stdin);
-        if (c >= 0)
+        pixels = calloc(1, sizeof(Color));
+
+        /* getting the bytes from stdin and building the pixel array */
+        unsigned int i = 0;
+        while (true)
         {
-            if (verbose && i % 32768 == 0) printf("i: %d\n", i);
-            if (i % 3 == 0 && i != 0) {
-                pixelcnt++;
-                pixels = realloc(pixels, pixelcnt*sizeof(Color));
-            }
-            if (i%3==0) pixels[(int)((i+1*(i==0))/3)].r = c;
-            if (i%3==1) pixels[(int)((i+1*(i==0))/3)].g = c;
-            if (i%3==2) pixels[(int)((i+1*(i==0))/3)].b = c;
-            pixels[(int)((i+1*(i==0))/3)].a = 0xff;
-            i++;
-        } else {
-            switch (i%3)
+            int c = getc(stdin);
+            if (c >= 0)
             {
-                case 0:
-                    pixels[(int)((i+1*(i==0))/3)].g = 0;
-                    pixels[(int)((i+1*(i==0))/3)].b = 0;
-                    break;
-                case 1:
-                    pixels[(int)((i+1*(i==0))/3)].b = 0;
+                if (verbose && i % 32768 == 0) printf("i: %d\n", i);
+                if (i % 3 == 0 && i != 0) {
+                    pixelcnt++;
+                    pixels = realloc(pixels, pixelcnt*sizeof(Color));
+                }
+                if (i%3==0) pixels[(int)((i+1*(i==0))/3)].r = c;
+                if (i%3==1) pixels[(int)((i+1*(i==0))/3)].g = c;
+                if (i%3==2) pixels[(int)((i+1*(i==0))/3)].b = c;
+                pixels[(int)((i+1*(i==0))/3)].a = 0xff;
+                i++;
+            } else {
+                switch (i%3)
+                {
+                    case 0:
+                        pixels[(int)((i+1*(i==0))/3)].g = 0;
+                        pixels[(int)((i+1*(i==0))/3)].b = 0;
+                        break;
+                    case 1:
+                        pixels[(int)((i+1*(i==0))/3)].b = 0;
+                }
+                break;
             }
-            break;
+        }
+
+        /* figuring out the grid size: */
+        width = 1;
+        while (pixelcnt > width*width) width++;
+
+        /* allocating new pixels in order to fit the grid: */
+        pixels = realloc(pixels, width*width*sizeof(Color));
+
+        /* setting said new pixels to 0x000000FF */
+        for (unsigned int l = 0; l < width*width-pixelcnt; l++)
+        {
+            pixels[pixelcnt+l].r = 0;
+            pixels[pixelcnt+l].g = 0;
+            pixels[pixelcnt+l].b = 0;
+            pixels[pixelcnt+l].a = 255;
+        }
+
+        // make the image final image
+        Image finalImage = (Image){pixels, width, width, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
+
+        // what to do with the final image:
+        if (santamaria && prefferedWidth>=width) /* if window rendering option is true and can display */
+        {
+            SetTargetFPS(60);
+            scale = (prefferedWidth/width);
+            SetTraceLogLevel(LOG_ERROR);
+
+            InitWindow(width*scale, width*scale, "0x4e to rgb");
+            BeginDrawing();
+            ClearBackground(BLACK);
+            
+            DrawTextureEx(LoadTextureFromImage(finalImage), (Vector2){0, 0}, 0.0f, scale, WHITE);
+            
+            EndDrawing();
+            free(pixels);
+            while (!WindowShouldClose()) { PollInputEvents(); }
+            CloseWindow();
+        }
+        else if (santamaria && prefferedWidth<width) /* if window rendering option is true but can't display */
+        {
+            free(pixels);
+            printf("Sorry, the image is too big to display at the preffered width!\n");
+        }
+        else /* if window rendering option is not true*/
+        {
+            ExportImage
+            (
+            finalImage,
+            "color.png"
+            );
+            free(pixels);
         }
     }
-
-    /* figuring out the grid size: */
-    width = 1;
-    while (pixelcnt > width*width) width++;
-
-    /* allocating new pixels in order to fit the grid: */
-    pixels = realloc(pixels, width*width*sizeof(Color));
-
-    /* setting said new pixels to 0x000000FF */
-    for (unsigned int l = 0; l < width*width-pixelcnt; l++)
+    else
     {
-        pixels[pixelcnt+l].r = 0;
-        pixels[pixelcnt+l].g = 0;
-        pixels[pixelcnt+l].b = 0;
-        pixels[pixelcnt+l].a = 255;
-    }
+        /* getting compressed image data as input: */
+        inBytes = calloc(1, 1);
+        unsigned int i = 0;
+        while (true)
+        {
+            int c = getc(stdin);
+            if (c >= 0)
+            {
+                printf("i:%d  c:%c\n", i, c);
+                inBytes[i] = c;
+                i++;
+                inBytes = realloc(inBytes, 1+i);
+            }
+            else
+            {
+                break;
+            }
+        }
+        Image inputImage = LoadImageFromMemory(".png", inBytes, i);
+        // printf("%d \n", inputImage.format); // debug
+        // inputImage.mipmaps = 1; // really necessary?
+        // ImageFormat(&inputImage, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8); // really necessary?
 
-    // make the image final image
-    Image finalImage = (Image){pixels, width, width, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
+        /* using the decompressed byte data */
+        unsigned char * inputImageChars = inputImage.data;
 
-    // what to do with the final image:
-    if (santamaria && prefferedWidth>=width) /* if window rendering option is true and can display */
-    {
-        SetTargetFPS(60);
-        scale = (prefferedWidth/width);
-        SetTraceLogLevel(LOG_ERROR);
+        int l = strlen((char * ) inputImageChars);
+        // printf("%d <- l\n", l); // debnug
 
-        InitWindow(width*scale, width*scale, "0x4e to rgb");
-        BeginDrawing();
-        ClearBackground(BLACK);
-        
-        DrawTextureEx(LoadTextureFromImage(finalImage), (Vector2){0, 0}, 0.0f, scale, WHITE);
-        
-        EndDrawing();
-        free(pixels);
-        while (!WindowShouldClose()) { PollInputEvents(); }
-        CloseWindow();
+        outBytes = malloc(l-((l-(l%4))/4));
+        // printf("%d <- the formula thing\n", l-((l-(l%4))/4)); // debug
+
+        /* getting rid of useless 0xFF bytes: */
+        unsigned int k = 0;
+        for (unsigned int j = 0; j < l; j++)
+        {
+            if ((j+1) % 4 != 0)
+            {
+                outBytes[k] = inputImageChars[j];
+                printf("j:%d, k:%d\n", j, k);
+                k++;
+            }
+        }
+
+        /* finally, saving the file: */
+        SaveFileData("bytes", outBytes, k-1);
     }
-    else if (santamaria && prefferedWidth<width) /* if window rendering option is true but can't display */
-    {
-        free(pixels);
-        printf("Sorry, the image is too big to display at the preffered width!\n");
-    }
-    else /* if window rendering option is not true*/
-    {
-        ExportImage(
-        finalImage,
-        "color-(previously-bytes).png");
-        free(pixels);
-    }
+    
 }
 
 /* THANKS SECTION: */
