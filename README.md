@@ -19,11 +19,11 @@ Flags:
 
 -w --width : change the preffered width of the window (only has any effect if also doing -d/--display/--draw
 
--r --reverse : WIP
+-r --reverse : Take an image as input, and spit out a file as output. The reverse of the program's default function.
 
 ## To do
-- Add option to reverse the effect of the program by taking in an image as the input and outputting a file.
 - Add option to memcmp 2 files and show the differences between them (if any) as an rgb8 image.
+- [DONE] Add option to reverse the effect of the program by taking in an image as the input and outputting a file.
 
 ## Known issues
 - [FIXED] If started with `-d`, the program will not listen to kill signals, and must be killed with ^C.
