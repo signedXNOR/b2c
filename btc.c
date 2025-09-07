@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <raylib.h>
 
@@ -19,6 +20,7 @@ unsigned int prefferedWidth = 720;
 
 unsigned char * inBytes;
 unsigned char * outBytes;
+u_int32_t bytecnt = 0;
 
 int main(int argc, char ** argv)
 {
@@ -77,6 +79,7 @@ int main(int argc, char ** argv)
                 break;
             }
         }
+        bytecnt = i;
 
         /* figuring out the grid size: */
         width = 1;
@@ -128,9 +131,13 @@ int main(int argc, char ** argv)
             "color.png"
             );
             free(pixels);
+            FILE * bytecntFile = fopen("bytecnt.boop", "w");
+            fwrite(&bytecnt, 4, 1, bytecntFile);
+            fclose(bytecntFile);
+            printf("%d \n", bytecnt);
         }
     }
-    else
+    else /* this is a mess :] */
     {
         /* getting compressed image data as input: */
         inBytes = calloc(1, 1);
@@ -140,7 +147,7 @@ int main(int argc, char ** argv)
             int c = getc(stdin);
             if (c >= 0)
             {
-                printf("i:%d  c:%c\n", i, c);
+                // printf("i:%d  c:%c\n", i, c); // debug
                 inBytes[i] = c;
                 i++;
                 inBytes = realloc(inBytes, 1+i);
@@ -151,33 +158,29 @@ int main(int argc, char ** argv)
             }
         }
         Image inputImage = LoadImageFromMemory(".png", inBytes, i);
-        // printf("%d \n", inputImage.format); // debug
-        // inputImage.mipmaps = 1; // really necessary?
-        // ImageFormat(&inputImage, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8); // really necessary?
 
         /* using the decompressed byte data */
         unsigned char * inputImageChars = inputImage.data;
 
-        int l = strlen((char * ) inputImageChars);
+        /* getting the size of the byte data */
+        FILE * bytecntFile = fopen("bytecnt.boop", "r");
+        int l;
+        fread(&l, 4, 1, bytecntFile);
+        fclose(bytecntFile);
         // printf("%d <- l\n", l); // debnug
 
-        outBytes = malloc(l-((l-(l%4))/4));
-        // printf("%d <- the formula thing\n", l-((l-(l%4))/4)); // debug
+        outBytes = malloc(l);
 
         /* getting rid of useless 0xFF bytes: */
         unsigned int k = 0;
         for (unsigned int j = 0; j < l; j++)
         {
-            if ((j+1) % 4 != 0)
-            {
-                outBytes[k] = inputImageChars[j];
-                printf("j:%d, k:%d\n", j, k);
-                k++;
-            }
+            if ((j+k+1) % 4 == 0) k++;
+            outBytes[j] = inputImageChars[j+k];
         }
 
         /* finally, saving the file: */
-        SaveFileData("bytes", outBytes, k-1);
+        SaveFileData("bytes", outBytes, l);
     }
     
 }
