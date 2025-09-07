@@ -6,7 +6,7 @@ Image shows a Windows executable ^^^
 Made with raylib.
 
 ## What it does
-It takes raw byte data through standard input, whether typed in manually or piped in, assigns each byte to a red, green or blue value (alpha channel is permanently at 255), those become pixels in an array which becomes an image written to the disk.
+It takes raw byte data through standard input, whether typed in manually or piped in, assigns each byte to a red, green or blue channel (alpha channel is permanently at 255), those become pixels in an array which becomes an image written to the disk.
 
 ## How to use it
 stdin.
