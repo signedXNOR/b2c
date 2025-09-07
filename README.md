@@ -19,7 +19,7 @@ Flags:
 
 -w --width : change the preffered width of the window (only has any effect if also doing -d/--display/--draw)
 
--r --reverse : Take an image as input, and spit out a file as output. The reverse of the program's default function. (ONLY WORKS WITH TEXT FILES, OOPS)
+-r --reverse : Take an image as input, and spit out a file as output. The reverse of the program's default function.
 
 ## To do
 - Add option to memcmp 2 files and show the differences between them (if any) as an rgb8 image.
