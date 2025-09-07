@@ -20,7 +20,7 @@ unsigned int prefferedWidth = 720;
 
 unsigned char * inBytes;
 unsigned char * outBytes;
-u_int32_t bytecnt = 0;
+u_int64_t bytecnt = 0;
 
 int main(int argc, char ** argv)
 {
@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
         pixels = calloc(1, sizeof(Color));
 
         /* getting the bytes from stdin and building the pixel array */
-        unsigned int i = 0;
+        unsigned long i = 0;
         while (true)
         {
             int c = getc(stdin);
@@ -132,7 +132,7 @@ int main(int argc, char ** argv)
             );
             free(pixels);
             FILE * bytecntFile = fopen("bytecnt.boop", "w");
-            fwrite(&bytecnt, 4, 1, bytecntFile);
+            fwrite(&bytecnt, 8, 1, bytecntFile);
             fclose(bytecntFile);
         }
     }
@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
     {
         /* getting compressed image data as input: */
         inBytes = calloc(1, 1);
-        unsigned int i = 0;
+        unsigned long i = 0;
         while (true)
         {
             int c = getc(stdin);
@@ -164,7 +164,7 @@ int main(int argc, char ** argv)
         /* getting the size of the byte data */
         FILE * bytecntFile = fopen("bytecnt.boop", "r");
         int l;
-        fread(&l, 4, 1, bytecntFile);
+        fread(&l, 8, 1, bytecntFile);
         fclose(bytecntFile);
         // printf("%d <- l\n", l); // debnug
 
