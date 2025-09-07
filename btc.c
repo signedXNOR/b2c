@@ -134,7 +134,6 @@ int main(int argc, char ** argv)
             FILE * bytecntFile = fopen("bytecnt.boop", "w");
             fwrite(&bytecnt, 4, 1, bytecntFile);
             fclose(bytecntFile);
-            printf("%d \n", bytecnt);
         }
     }
     else /* this is a mess :] */
